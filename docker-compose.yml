@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+    couchbase1:
+        build: 
+            context: './couchbase1'
+            dockerfile: Dockerfile
+        ports:
+            - 8091:8091
+            - 8092:8092
+            - 8093:8093
+            - 8094:8094
+            - 11210:11210
+        networks: 
+            couchbase-net:
+                ipv4_address: 172.16.101.12
+    couchbase2:
+        build: 
+            context: './couchbase2'
+            dockerfile: Dockerfile
+        ports:
+            - 18091:8091
+            - 18092:8092
+            - 18093:8093
+            - 18094:8094
+            - 21210:11210
+        networks:
+            couchbase-net:
+                ipv4_address: 172.16.101.13
+        links: 
+            - couchbase1
+        depends_on: 
+            - couchbase1
+    couchbase3:
+        build: 
+            context: './couchbase3'
+            dockerfile: Dockerfile
+        ports:
+            - 28091:8091
+            - 28092:8092
+            - 28093:8093
+            - 28094:8094
+            - 31210:11210
+        networks:
+            couchbase-net:
+                ipv4_address: 172.16.101.14
+        links: 
+            - couchbase1
+        depends_on: 
+            - couchbase1
+    ibmmq: 
+        build: 
+            context: './ibmmq'
+            dockerfile: Dockerfile
+        environment: 
+            - LICENSE=accept
+            - MQ_QMGR_NAME=QM1
+            - MQ_DEV=false
+        ports: 
+            - "1414:1414"
+            - "9443:9443"
+networks:
+    couchbase-net:
+        name: couchbase-net
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.16.101.0/24
